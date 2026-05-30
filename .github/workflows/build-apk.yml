@@ -21,7 +21,10 @@ jobs:
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
-        channel: stable
+        flutter-version: '3.41.7'
+
+    - name: Check Flutter Version
+      run: flutter --version
 
     - name: Flutter Doctor
       run: flutter doctor
@@ -33,6 +36,11 @@ jobs:
         pip install -r requirements.txt
         pip install -U flet flet-cli
 
+    - name: Check Flet Version
+      run: |
+        pip show flet
+        pip show flet-cli
+
     - name: Build APK with Flet
       run: |
         cd granja
@@ -40,6 +48,10 @@ jobs:
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+    - name: Find APK
+      run: |
+        find granja -name "*.apk"
 
     - name: Upload APK to Release
       uses: softprops/action-gh-release@v2
