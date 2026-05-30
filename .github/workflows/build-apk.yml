@@ -44,7 +44,7 @@ jobs:
     - name: Build APK with Flet
       run: |
         cd granja
-        flet build apk
+        flet build apk --module-name run
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
