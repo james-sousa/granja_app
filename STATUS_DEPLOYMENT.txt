@@ -1,0 +1,82 @@
+```
+╔════════════════════════════════════════════════════════════════════╗
+║                   GRANJA MANAGER - RAILWAY READY                   ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  ✅ Procfile                    - Inicialização configurada       ║
+║  ✅ requirements.txt (raiz)     - Dependências listadas           ║
+║  ✅ runtime.txt                 - Python 3.11.8 especificado      ║
+║  ✅ .env.example                - Template de variáveis            ║
+║  ✅ DEPLOY_RAPIDO.md           - Guia rápido (2 min)             ║
+║  ✅ DEPLOY_RAILWAY.md          - Guia completo                    ║
+║  ✅ CHECKLIST_DEPLOY.md        - Checklist pré-flight            ║
+║  ✅ config.py                   - Carrega variáveis do ambiente   ║
+║                                                                    ║
+╠════════════════════════════════════════════════════════════════════╣
+║                        PRÓXIMOS PASSOS                            ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  1. Fazer commit dos arquivos:                                    ║
+║     $ git add -A                                                   ║
+║     $ git commit -m "Preparar para Railway"                        ║
+║     $ git push origin main                                         ║
+║                                                                    ║
+║  2. Acessar https://railway.app                                    ║
+║     • New Project → Deploy from GitHub                            ║
+║     • Autorizar e selecionar: granja_app                          ║
+║                                                                    ║
+║  3. Configurar Variáveis (Variables):                             ║
+║     • SUPABASE_URL = https://seu-projeto.supabase.co             ║
+║     • SUPABASE_ANON_KEY = sua-chave-anonima                       ║
+║                                                                    ║
+║  4. Clicar "Deploy" e aguardar ✅                                  ║
+║                                                                    ║
+║  5. Testar em produção:                                            ║
+║     https://seu-projeto-prod.up.railway.app                       ║
+║                                                                    ║
+╠════════════════════════════════════════════════════════════════════╣
+║                         ARQUIVOS GERADOS                          ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  📄 Procfile                                                       ║
+║     └─ Instrui Railway a executar: flet run --web                 ║
+║                                                                    ║
+║  📦 requirements.txt (raiz)                                        ║
+║     └─ flet==0.25.2, supabase==2.0.3, requests, python-dotenv    ║
+║                                                                    ║
+║  🐍 runtime.txt                                                    ║
+║     └─ python-3.11.8                                              ║
+║                                                                    ║
+║  🔐 .env.example                                                   ║
+║     └─ Template para variáveis (NUNCA fazer commit de .env!)     ║
+║                                                                    ║
+║  📖 Documentação:                                                  ║
+║     • DEPLOY_RAPIDO.md ............ 2 min leitura                 ║
+║     • DEPLOY_RAILWAY.md .......... Detalhado + troubleshooting   ║
+║     • CHECKLIST_DEPLOY.md ........ Verificação pré-flight        ║
+║                                                                    ║
+╠════════════════════════════════════════════════════════════════════╣
+║                      CHECKLIST PRÉ-DEPLOYMENT                      ║
+╠════════════════════════════════════════════════════════════════════╣
+║                                                                    ║
+║  ☐ Fazer commit: git push origin main                             ║
+║  ☐ Abrir: https://railway.app                                     ║
+║  ☐ Conectar: Deploy from GitHub                                   ║
+║  ☐ Configurar: Variáveis de ambiente Supabase                     ║
+║  ☐ Deploy: Clicar Deploy e aguardar ✅                            ║
+║  ☐ Testar: Login, Esqueci senha, Funcionalidades básicas          ║
+║  ☐ Verificar: Logs em "Deployments"                               ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+```
+
+## 🎯 Resumo Rápido
+
+Your app is **ready for production**! ✨
+
+**Tempo estimado**: 15-20 min (incluindo setup no Railway)
+
+**Suporte**: 
+- Leia `DEPLOY_RAPIDO.md` para 2 min overview
+- Leia `DEPLOY_RAILWAY.md` para guia completo
+- Consulte `CHECKLIST_DEPLOY.md` se tiver dúvidas

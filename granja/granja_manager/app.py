@@ -467,7 +467,7 @@ def view_dashboard(dashboard_service: DashboardService, page: ft.Page, usuario: 
         page: Página Flet
         usuario: Dicionário com dados do usuário logado
     """
-    Icons = ft.icons
+    Icons = ft.Icons
     nome_usuario = usuario.get('nome', 'Usuário') if usuario else 'Usuário'
 
     try:
@@ -801,7 +801,7 @@ def view_dashboard(dashboard_service: DashboardService, page: ft.Page, usuario: 
 
 def view_produtos(produto_service: ProdutoService, page: ft.Page) -> ft.Control:
     """View de Produtos com CRUD completo."""
-    Icons = ft.icons
+    Icons = ft.Icons
     grid_ref = ft.Ref[ft.ResponsiveRow]()
 
     nome_field = ft.TextField(label="Nome do produto", border_radius=8)
@@ -1006,7 +1006,7 @@ def view_produtos(produto_service: ProdutoService, page: ft.Page) -> ft.Control:
 
 def view_clientes_pendentes(cliente_service: ClienteService, page: ft.Page) -> ft.Control:
     """View de Clientes com pendências."""
-    Icons = ft.icons
+    Icons = ft.Icons
 
     lista_ref = ft.Ref[ft.Column]()
     total_ref = ft.Ref[ft.Text]()
@@ -1349,7 +1349,7 @@ def view_estoque(estoque_service, produto_service: ProdutoService, page: ft.Page
     from granja_manager.models import Insumo
     import uuid
     
-    Icons = ft.icons
+    Icons = ft.Icons
     insumo_repo = InsumoRepository()
     lista_ref  = ft.Ref[ft.Column]()
     busca_ref  = ft.Ref[ft.TextField]()
@@ -1625,7 +1625,7 @@ def view_estoque(estoque_service, produto_service: ProdutoService, page: ft.Page
 
 def view_gastos(gasto_service: GastoService, page: ft.Page) -> ft.Control:
     """View de Gastos com CRUD completo."""
-    Icons = ft.icons
+    Icons = ft.Icons
     lista_ref = ft.Ref[ft.Column]()
     total_ref = ft.Ref[ft.Text]()
 
@@ -1790,7 +1790,7 @@ def view_gastos(gasto_service: GastoService, page: ft.Page) -> ft.Control:
 
 def view_pedidos(pedido_service: PedidoService, produto_service: ProdutoService, page: ft.Page) -> ft.Control:
     """View de Pedidos."""
-    Icons = ft.icons
+    Icons = ft.Icons
     lista_ref = ft.Ref[ft.Column]()
 
     def _rebuild(e=None):
@@ -2190,7 +2190,7 @@ def view_pedidos(pedido_service: PedidoService, produto_service: ProdutoService,
 
 def view_login(auth_service, page: ft.Page, on_login_success, on_navigate) -> ft.Control:
     """View de Login"""
-    Icons = ft.icons
+    Icons = ft.Icons
     
     email_field = ft.TextField(label="Email", border_radius=8, 
                               keyboard_type=ft.KeyboardType.EMAIL)
@@ -2222,6 +2222,9 @@ def view_login(auth_service, page: ft.Page, on_login_success, on_navigate) -> ft
     def on_ir_cadastro(e):
         on_navigate("/cadastro")
     
+    def on_ir_recuperar_senha(e):
+        on_navigate("/recuperar-senha")
+    
     return ft.Container(
         content=ft.Column(
             controls=[
@@ -2244,6 +2247,14 @@ def view_login(auth_service, page: ft.Page, on_login_success, on_navigate) -> ft
                         controls=[
                             email_field,
                             senha_field,
+                            ft.Container(
+                                content=ft.Text("Esqueci a senha", size=11, 
+                                              color=C["success"],
+                                              weight=ft.FontWeight.BOLD),
+                                on_click=on_ir_recuperar_senha,
+                                ink=True,
+                                alignment=ft.Alignment(1, 0),
+                            ),
                             ft.Text(ref=erro_ref, value="", color=C["danger"], size=12),
                             ft.Row(
                                 controls=[_btn_primary("Entrar", Icons.LOGIN, on_login)],
@@ -2287,7 +2298,7 @@ def view_login(auth_service, page: ft.Page, on_login_success, on_navigate) -> ft
 
 def view_cadastro(auth_service, page: ft.Page, on_login_success, on_navigate) -> ft.Control:
     """View de Cadastro"""
-    Icons = ft.icons
+    Icons = ft.Icons
     
     nome_field = ft.TextField(label="Nome completo", border_radius=8)
     email_field = ft.TextField(label="Email", border_radius=8,
@@ -2394,6 +2405,210 @@ def view_cadastro(auth_service, page: ft.Page, on_login_success, on_navigate) ->
     )
 
 
+def view_recuperar_senha(auth_service, page: ft.Page, on_navigate) -> ft.Control:
+    """View de Recuperação de Senha"""
+    Icons = ft.Icons
+    
+    email_field = ft.TextField(label="Email", border_radius=8, 
+                              keyboard_type=ft.KeyboardType.EMAIL)
+    mensagem_ref = ft.Ref[ft.Text]()
+    erro_ref = ft.Ref[ft.Text]()
+    
+    def on_recuperar(e):
+        email = email_field.value.strip()
+        
+        if not email:
+            erro_ref.current.value = "Preencha o campo de email"
+            page.update()
+            return
+        
+        sucesso, msg = auth_service.recuperar_senha(email)
+        
+        if sucesso:
+            mensagem_ref.current.value = msg
+            mensagem_ref.current.color = C["success"]
+            logger.info(f"✅ Email de recuperação enviado para: {email}")
+            page.update()
+        else:
+            erro_ref.current.value = msg
+            page.update()
+    
+    def on_ir_login(e):
+        on_navigate("/login")
+    
+    return ft.Container(
+        content=ft.Column(
+            controls=[
+                ft.Container(
+                    content=ft.Column(
+                        controls=[
+                            ft.Text("🐔 Granja Santo Antonio", size=28, 
+                                   weight=ft.FontWeight.BOLD, color=C["success"]),
+                            ft.Text("Recuperar senha", size=14, 
+                                   color=C["text_label"]),
+                        ],
+                        spacing=4,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                    padding=ft.Padding(left=0, top=40, right=0, bottom=40),
+                    alignment=ft.Alignment(0, 0),
+                ),
+                ft.Container(
+                    content=ft.Column(
+                        controls=[
+                            ft.Text("Digite seu email para receber um link de recuperação de senha", 
+                                   size=12, color=C["text_label"],
+                                   text_align=ft.TextAlign.CENTER),
+                            email_field,
+                            ft.Text(ref=erro_ref, value="", color=C["danger"], size=12),
+                            ft.Text(ref=mensagem_ref, value="", color=C["success"], size=12),
+                            ft.Row(
+                                controls=[_btn_primary("Enviar email", Icons.EMAIL, on_recuperar)],
+                                alignment=ft.MainAxisAlignment.CENTER,
+                            ),
+                            ft.Divider(height=20, color=C["border"]),
+                            ft.Row(
+                                controls=[
+                                    ft.Text("Lembrou a senha?", size=12, color=C["text_label"]),
+                                    ft.Container(
+                                        content=ft.Text("Voltar ao login", size=12, 
+                                                      color=C["success"],
+                                                      weight=ft.FontWeight.BOLD),
+                                        on_click=on_ir_login,
+                                        ink=True,
+                                    ),
+                                ],
+                                spacing=8,
+                                alignment=ft.MainAxisAlignment.CENTER,
+                            ),
+                        ],
+                        spacing=16,
+                        tight=True,
+                        width=340,
+                    ),
+                    padding=40,
+                    border_radius=14,
+                    border=ft.Border(left=ft.BorderSide(1, C["border"]), right=ft.BorderSide(1, C["border"]), top=ft.BorderSide(1, C["border"]), bottom=ft.BorderSide(1, C["border"])),
+                    bgcolor=C["surface"],
+                    alignment=ft.Alignment(0, 0),
+                ),
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            expand=True,
+        ),
+        bgcolor=C["bg"],
+        expand=True,
+    )
+
+
+def view_resetar_senha(auth_service, page: ft.Page, token: str, on_navigate) -> ft.Control:
+    """View de Reset de Senha com token de recovery"""
+    Icons = ft.Icons
+    
+    nova_senha_field = ft.TextField(label="Nova Senha", border_radius=8, password=True)
+    confirma_senha_field = ft.TextField(label="Confirmar Senha", border_radius=8, password=True)
+    mensagem_ref = ft.Ref[ft.Text]()
+    erro_ref = ft.Ref[ft.Text]()
+    
+    def on_resetar(e):
+        nova_senha = nova_senha_field.value
+        confirma = confirma_senha_field.value
+        
+        if not nova_senha or not confirma:
+            erro_ref.current.value = "Preencha todos os campos"
+            page.update()
+            return
+        
+        if nova_senha != confirma:
+            erro_ref.current.value = "As senhas não coincidem"
+            page.update()
+            return
+        
+        sucesso, msg = auth_service.resetar_senha(nova_senha, token)
+        
+        if sucesso:
+            mensagem_ref.current.value = msg
+            mensagem_ref.current.color = C["success"]
+            logger.info("✅ Senha resetada com sucesso")
+            page.update()
+            # Redirecionar para login após 2 segundos
+            import time
+            page.run_task(lambda: (time.sleep(2), on_navigate("/login")))
+        else:
+            erro_ref.current.value = msg
+            page.update()
+    
+    def on_ir_login(e):
+        on_navigate("/login")
+    
+    return ft.Container(
+        content=ft.Column(
+            controls=[
+                ft.Container(
+                    content=ft.Column(
+                        controls=[
+                            ft.Text("🐔 Granja Santo Antonio", size=28, 
+                                   weight=ft.FontWeight.BOLD, color=C["success"]),
+                            ft.Text("Nova senha", size=14, 
+                                   color=C["text_label"]),
+                        ],
+                        spacing=4,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                    padding=ft.Padding(left=0, top=40, right=0, bottom=40),
+                    alignment=ft.Alignment(0, 0),
+                ),
+                ft.Container(
+                    content=ft.Column(
+                        controls=[
+                            ft.Text("Digite sua nova senha", 
+                                   size=12, color=C["text_label"],
+                                   text_align=ft.TextAlign.CENTER),
+                            nova_senha_field,
+                            confirma_senha_field,
+                            ft.Text(ref=erro_ref, value="", color=C["danger"], size=12),
+                            ft.Text(ref=mensagem_ref, value="", color=C["success"], size=12),
+                            ft.Row(
+                                controls=[_btn_primary("Resetar Senha", Icons.LOCK, on_resetar)],
+                                alignment=ft.MainAxisAlignment.CENTER,
+                            ),
+                            ft.Divider(height=20, color=C["border"]),
+                            ft.Row(
+                                controls=[
+                                    ft.Text("Voltar?", size=12, color=C["text_label"]),
+                                    ft.Container(
+                                        content=ft.Text("Login", size=12, 
+                                                      color=C["success"],
+                                                      weight=ft.FontWeight.BOLD),
+                                        on_click=on_ir_login,
+                                        ink=True,
+                                    ),
+                                ],
+                                spacing=8,
+                                alignment=ft.MainAxisAlignment.CENTER,
+                            ),
+                        ],
+                        spacing=16,
+                        tight=True,
+                        width=340,
+                    ),
+                    padding=40,
+                    border_radius=14,
+                    border=ft.Border(left=ft.BorderSide(1, C["border"]), right=ft.BorderSide(1, C["border"]), top=ft.BorderSide(1, C["border"]), bottom=ft.BorderSide(1, C["border"])),
+                    bgcolor=C["surface"],
+                    alignment=ft.Alignment(0, 0),
+                ),
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            expand=True,
+        ),
+        bgcolor=C["bg"],
+        expand=True,
+    )
+
+
 # ══════════════════════════════════════════════════════════════════
 # APLICAÇÃO PRINCIPAL
 # ══════════════════════════════════════════════════════════════════
@@ -2423,6 +2638,32 @@ def main(page: ft.Page):
     # Estado de autenticação
     usuario_logado = [None]  # [usuario_dict ou None]
     
+    # Verificar se há token de recovery na URL
+    recovery_token = [None]  # [token ou None]
+    
+    def _extrair_token_recovery():
+        """Extrai token de recovery do hash da URL."""
+        try:
+            if page.hash and "#access_token=" in page.hash:
+                # Extrair access_token do hash
+                params = {}
+                for param in page.hash.split("&"):
+                    if "=" in param:
+                        key, value = param.split("=", 1)
+                        params[key] = value
+                
+                # Verificar se é um token de recovery
+                if params.get("type") == "recovery" and params.get("access_token"):
+                    recovery_token[0] = params.get("access_token")
+                    return True
+        except Exception as e:
+            logger.warning(f"⚠️  Erro ao extrair token: {e}")
+        
+        return False
+    
+    # Executar verificação na inicialização
+    _extrair_token_recovery()
+    
     def on_login_success(usuario):
         """Callback quando login é bem-sucedido."""
         usuario_logado[0] = usuario
@@ -2449,6 +2690,22 @@ def main(page: ft.Page):
         elif page.route == "/cadastro":
             page.clean()
             page.add(view_cadastro(auth_service, page, on_login_success, navigate))
+        elif page.route == "/recuperar-senha":
+            page.clean()
+            page.add(view_recuperar_senha(auth_service, page, navigate))
+        elif page.route.startswith("/resetar-senha"):
+            # Extrair token da URL (hash)
+            token = None
+            if "#access_token=" in page.route:
+                token = page.route.split("#access_token=")[1].split("&")[0]
+            
+            if token:
+                page.clean()
+                page.add(view_resetar_senha(auth_service, page, token, navigate))
+            else:
+                # Token inválido, voltar ao login
+                page.route = "/login"
+                _refresh_page()
         elif usuario_logado[0]:
             # Mostrar dashboard (logado)
             page.clean()
@@ -2468,8 +2725,11 @@ def main(page: ft.Page):
     
     page.on_route_change = route_change
     
-    # Iniciar no login
-    page.route = "/login"
+    # Iniciar no login ou ir para reset de senha se houver token
+    if recovery_token[0]:
+        page.route = f"/resetar-senha#{recovery_token[0]}"
+    else:
+        page.route = "/login"
 
     current_route     = ["dashboard"]
     sidebar_collapsed = [False]  # será ajustado após page.width estar disponível
@@ -2656,7 +2916,7 @@ def main(page: ft.Page):
     def _gerar_alertas() -> list:
         """Analisa dados da granja e gera lista de alertas contextuais."""
         alertas = []
-        Icons = ft.icons
+        Icons = ft.Icons
 
         # 1. Clientes com pagamento pendente
         pendencias = cliente_service.obter_clientes_com_pendencias()

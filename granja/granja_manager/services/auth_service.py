@@ -179,3 +179,99 @@ class AuthService:
     def esta_logado(self) -> bool:
         """Verifica se há sessão ativa."""
         return self.usuario_logado is not None
+
+    def recuperar_senha(self, email: str) -> Tuple[bool, str]:
+        """Envia email para recuperação de senha.
+        
+        Args:
+            email: Email do usuário
+            
+        Returns:
+            (sucesso, mensagem)
+        """
+        try:
+            if not self.supabase_client:
+                return False, "Autenticação não configurada"
+            
+            email = email.strip().lower()
+            if not self._validar_email(email):
+                return False, "Email inválido"
+            
+            # Usar API REST do Supabase para reset de senha
+            from config import SUPABASE_URL, SUPABASE_ANON_KEY
+            import requests
+            
+            url = f"{SUPABASE_URL}/auth/v1/recover"
+            headers = {
+                "apikey": SUPABASE_ANON_KEY,
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "email": email,
+                "gotrue_meta_security": {}
+            }
+            
+            response = requests.post(url, json=payload, headers=headers)
+            
+            if response.status_code in [200, 204]:
+                logger.info(f"✅ Email de reset enviado para: {email}")
+                return True, f"Email de recuperação enviado para {email}"
+            else:
+                error_msg = response.text
+                if "not found" in error_msg.lower():
+                    return False, "Email não encontrado"
+                logger.error(f"❌ Erro na API de reset: {error_msg}")
+                return False, "Erro ao enviar email. Tente novamente mais tarde."
+            
+        except Exception as e:
+            logger.error(f"❌ Erro ao recuperar senha: {e}")
+            return False, "Erro ao processar. Tente novamente mais tarde."
+
+    def resetar_senha(self, nova_senha: str, token: str) -> Tuple[bool, str]:
+        """Reseta a senha usando o token de recovery.
+        
+        Args:
+            nova_senha: Nova senha do usuário
+            token: Token de recovery enviado por email
+            
+        Returns:
+            (sucesso, mensagem)
+        """
+        try:
+            if not self.supabase_client:
+                return False, "Autenticação não configurada"
+            
+            valido, msg = self._validar_senha(nova_senha)
+            if not valido:
+                return False, f"Senha: {msg}"
+            
+            # Usar API REST do Supabase para resetar senha
+            from config import SUPABASE_URL, SUPABASE_ANON_KEY
+            import requests
+            
+            url = f"{SUPABASE_URL}/auth/v1/verify"
+            headers = {
+                "apikey": SUPABASE_ANON_KEY,
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "type": "recovery",
+                "token": token,
+                "password": nova_senha
+            }
+            
+            response = requests.post(url, json=payload, headers=headers)
+            
+            if response.status_code in [200, 204]:
+                logger.info("✅ Senha resetada com sucesso")
+                return True, "Senha alterada com sucesso! Faça login com a nova senha."
+            else:
+                error_msg = response.text
+                if "invalid" in error_msg.lower():
+                    return False, "Token expirado ou inválido"
+                logger.error(f"❌ Erro ao resetar senha: {error_msg}")
+                return False, "Erro ao resetar senha. Tente novamente mais tarde."
+            
+        except Exception as e:
+            logger.error(f"❌ Erro ao resetar senha: {e}")
+            return False, "Erro ao processar. Tente novamente mais tarde."
