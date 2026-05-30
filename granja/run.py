@@ -1,15 +1,7 @@
 #!/usr/bin/env python3
-"""
-Script para executar a aplicação Granja Manager
-
-Uso:
-    python run.py          # Executa a aplicação
-"""
-
 import sys
 import os
 
-# Adiciona o diretório do projeto ao path
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, PROJECT_ROOT)
 
@@ -18,7 +10,12 @@ if __name__ == "__main__":
     import flet as ft
     
     try:
-        ft.app(target=main)
+        ft.app(
+            target=main,
+            view=ft.AppView.WEB_BROWSER,
+            host="0.0.0.0",
+            port=int(os.environ.get("PORT", 8550))
+        )
     except KeyboardInterrupt:
         print("\nAplicação encerrada pelo usuário")
     except Exception as e:
